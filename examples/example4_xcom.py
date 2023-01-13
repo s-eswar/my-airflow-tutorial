@@ -35,4 +35,4 @@ with DAG('my_xcom4_3tasks_dag',start_date=datetime(2021, 1,1 ), max_active_runs=
     add_num = PythonOperator(task_id = 'add_numbers',python_callable=add_numbers)
     postprocess = PythonOperator(task_id = 'postprocess', python_callable=postprocess)
 
-    preprocess >> add_num >> postprocess()
+    preprocess >> add_num >> postprocess
