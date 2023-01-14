@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.empty import EmptyOperator
 
 def preprocess(ti,**kwargs):
     output={"valid":False}
@@ -34,10 +35,12 @@ default_args = {
     'retries': 1,
     'retry_delay': timedelta(minutes=5)
 }
-
 with DAG('my_xcom4_3tasks_dag',start_date=datetime(2021, 1,1 ), max_active_runs=2,schedule=timedelta(minutes=30),default_args=default_args,catchup=False) as dag:
     preprocess = PythonOperator(task_id='preprocess', python_callable=preprocess)
-    add_num = PythonOperator(task_id='add_numbers', python_callable=add_numbers)
-    postprocess = PythonOperator(task_id='postprocess', python_callable=postprocess)
+    add_num = PythonOperator(task_id = 'add_numbers',python_callable=add_numbers)
+    postprocess = PythonOperator(task_id = 'postprocess', python_callable=postprocess)
+    invalid = EmptyOperator(task_id='Invalid')
+    end = EmptyOperator(task_id='end')
+    start =  EmptyOperator(task_id='start')
 
-    preprocess >> add_num >> postprocess
+    start >> preprocess >> add_num >> postprocess >> end
